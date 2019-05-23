@@ -2,76 +2,84 @@ import React, { Component } from 'react';
 import './App.css';
 
 class App extends Component {
-  constructor() {
-    super();
-    this.state = {
-      name: "",
-      shareholders: [{ name: "" }]
+ state = {
+      number: 0,
+      list: []
     };
+  
+  
+  handleChange = (e) => {
+    this.setState({ number: Number(e.target.value) });
+  };
+  
+  
+   save =()=>{
+     console.log(this.state.list);
+   }
+
+
+  handleClick = () => {  
+    if(this.state.number > 30){ 
+     alert('Not Allowed To Use Number Older Than 30')
+    }else{
+    const list = new Array(this.state.list.length + this.state.number).fill({name:""},0);
+    console.log(list);
+    this.setState({ list });
+    }
+    if(this.state.list.length !== 0){
+      this.setState({ list : [] })
+    }  
+  };
+   
+  
+  onClear = () => {
+    this.setState({ list: [] });
+  };
+
+  _handleInputChange = (e,i) => {
+    if (["name"].includes(e.target.className)) {
+      let list = [...this.state.list]
+      list[i][e.target.dataset.id][e.target.className] = e.target.value
+      this.setState({list}); 
+    } else {
+      this.setState({[e.target.name]: e.target.value})
+    }   
   }
+  
+  renderInputs() {
+    let {list} = this.state
+    return list.map((item,i) => (
+        <div key={i}>
+        <label>{`${i + 1}-`}</label>
+                <input  placeholder="Name"  
+                 type="text"
+                 name="name"
+                 data-id={i}
+                 id="name"
+                 value={list.name} 
+                 className="name"
+                 onChange={(e) => this._handleInputChange(e,i)}
+                />
+        </div>
+    ));
+}
 
-  // ...
-
-  handleShareholderNameChange = idx => evt => {
-    const newShareholders = this.state.shareholders.map((shareholder, sidx) => {
-      if (idx !== sidx) return shareholder;
-      return { ...shareholder, name: evt.target.value };
-    });
-
-    this.setState({ shareholders: newShareholders });
-  };
-
-  handleSubmit = evt => {
-    const { name, shareholders } = this.state;
-    alert(`Incorporated: ${name} with ${shareholders.length} shareholders`);
-    console.log(this.state.shareholders)
-  };
-
-  handleAddShareholder = () => {
-    this.setState({
-      shareholders: this.state.shareholders.concat([{ name: "" }])
-    });
-  };
-
-  handleRemoveShareholder = idx => () => {
-    this.setState({
-      shareholders: this.state.shareholders.filter((s, sidx) => idx !== sidx)
-    });
-  };
+  
 
   render() {
     return (
-      <form onSubmit={this.handleSubmit}>
-        {/* ... */}
-        <h4>Shareholders</h4>
-
-        {this.state.shareholders.map((shareholder, idx) => (
-          <div className="shareholder">
-            <input
-              type="text"
-              placeholder={`Shareholder #${idx + 1} name`}
-              value={shareholder.name}
-              onChange={this.handleShareholderNameChange(idx)}
-            />
-            <button
-              type="button"
-              onClick={this.handleRemoveShareholder(idx)}
-              className="small"
-            >
-              -
-            </button>
-          </div>
-        ))}
-        <button
-          type="button"
-          onClick={this.handleAddShareholder}
-          className="small"
-        >
-          Add Shareholder
-        </button>
-        <button>Incorporate</button>
-      </form>
+      <div className="App">
+        <div>
+          <input min="0" max="30" type="number" onChange={this.handleChange} />
+          <button onClick={this.handleClick}>Add</button>
+          <button type="button" onClick={this.onClear}>Clear</button>
+          <button onClick={this.save}>Save</button>
+        </div>
+        <div>
+         {this.renderInputs()}
+        </div>
+      </div>
     );
-  }
+}  
 }
 export default App;
